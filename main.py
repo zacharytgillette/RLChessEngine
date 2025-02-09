@@ -21,8 +21,15 @@ def main():
     Bitboard.print(all_pieces)
 
     empty_squares = Bitboard.complement(all_pieces)
+    enemy_pieces = black_king.bitboard | black_pawns.bitboard | black_knights.bitboard
     
-    Bitboard.print(black_knights.all_moves(empty_squares), "after")
+    all_moves = white_knights.all_moves(empty_squares, enemy_pieces) + white_pawns.all_moves(empty_squares, enemy_pieces) + white_king.all_moves(empty_squares, enemy_pieces)
+
+    for move in all_moves:
+
+        Bitboard.print(move, "all da moves")
+
+
 
 if __name__ == "__main__":
     main()

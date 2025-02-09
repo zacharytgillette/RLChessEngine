@@ -40,6 +40,14 @@ class Bitboard:
     def complement(bitboard):
         return (~bitboard) & 0xffffffffffffffff
     
+    #get bitboard of least significant bit
+    def get_lsb(bitboard):
+        return bitboard & -bitboard
+    
+    def remove_lsb(bitboard, lsb_bitboard):
+
+        return bitboard & (Bitboard.complement(lsb_bitboard))
+    
     
     #converts bitboard into 64 char string
     def to_string(bitboard):
