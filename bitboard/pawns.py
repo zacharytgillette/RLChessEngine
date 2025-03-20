@@ -1,4 +1,5 @@
 from bitboard.simple_pieces import *
+from bitboard.info import *
 
 '''
 pawns class: overrides functionality from simple_pieces class
@@ -22,10 +23,14 @@ class Pawns(SimplePieces):
         
         if bitboard == None and color == WHITE:
             self.bitboard = 0x000000000000ff00
+            self.symbol = '\u265F'
         elif bitboard == None and color == BLACK:
             self.bitboard = 0x00ff000000000000
+            self.symbol = '\u2659'
         else:
             self.bitboard = bitboard
+
+        # self.enpassantBitboard = 0x0
 
     
     '''
@@ -56,6 +61,8 @@ class Pawns(SimplePieces):
             # they must be able to make the second move too
             to_ret = (first_move << 8) & empty_squares
 
+            #whipe en 
+
         else:
 
             # valid pawns must be on seventh rank
@@ -71,37 +78,54 @@ class Pawns(SimplePieces):
     
 
     #capture left
-    def left_captures(self, bitboard, enemy_pieces):
+    def left_captures(self, bitboard, enemy_pieces, info_bitboard):
 
-        if self.color == WHITE:
-            return (bitboard << 9) & enemy_pieces & EMPTY_RIGHT_SIDE
+        enpassant_bitboard = info_bitboard.enPassantRights.bitboard
+
+        if self.color == WHITE:                                                 #en passant
+            return ((bitboard << 9) & enemy_pieces & EMPTY_RIGHT_SIDE) | ((((self.bitboard << 1) & enpassant_bitboard) << 8) & EMPTY_RIGHT_SIDE)
         else:
-            return (bitboard >> 7) & enemy_pieces & EMPTY_RIGHT_SIDE
+            return ((bitboard >> 7) & enemy_pieces & EMPTY_RIGHT_SIDE) | ((((self.bitboard << 1) & enpassant_bitboard) >> 8) & EMPTY_RIGHT_SIDE)
     
     #capture right
-    def right_captures(self, bitboard, enemy_pieces):
+    def right_captures(self, bitboard, enemy_pieces, info_bitboard):
+
+        enpassant_bitboard = info_bitboard.enPassantRights.bitboard
         
-        if self.color == WHITE:
-            return (self.bitboard << 7) & enemy_pieces & EMPTY_LEFT_SIDE
+        if self.color == WHITE:                                                 #en passant
+            return ((self.bitboard << 7) & enemy_pieces & EMPTY_LEFT_SIDE) | ((((self.bitboard >> 1) & enpassant_bitboard) << 8) & EMPTY_LEFT_SIDE)
         else:
-            return (self.bitboard >> 9) & enemy_pieces & EMPTY_LEFT_SIDE
+            return ((self.bitboard >> 9) & enemy_pieces & EMPTY_LEFT_SIDE) | ((((self.bitboard >> 1) & enpassant_bitboard) >> 8) & EMPTY_LEFT_SIDE)
         
     #en passant 
     #(this requires having our meta data bitboards set up to see previous move)
     #so leave this for later
-    def en_passant(self, bitboard, empty_squares, enemy_pieces):
-        pass
-
+    # def en_passant_right(self, bitboard, empty_squares, enemy_pieces):
+        
+    #     if self.color == WHITE:
+    #         return (((self.bitboard >> 1) & self.enpassantBitboard) << 8) & EMPTY_LEFT_SIDE
+        
+    #     else:
+    #         return (((self.bitboard >> 1) & self.enpassantBitboard) >> 8) & EMPTY_LEFT_SIDE
+        
+    # def en_passant_left(self, bitboard, empty_squares, enemy_pieces):
+        
+    #     if self.color == WHITE:
+    #         return (((self.bitboard << 1) & self.enpassantBitboard) << 8) & EMPTY_RIGHT_SIDE
+        
+    #     else:
+    #         return (((self.bitboard << 1) & self.enpassantBitboard) >> 8) & EMPTY_RIGHT_SIDE
 
 
     '''
     compute resulting bitboards
     '''
 
-    def all_moves(self, empty_squares, enemy_pieces):
+    def all_moves(self, empty_squares, enemy_pieces, info_bitboard):
 
         #store all the (pre-move, post-move) mappings of individual piece bitmaps
         unique_post_move_bitboards = []
+
 
         #SINGLE MOVES
         post_move = self.single_moves(self.bitboard, empty_squares)
@@ -147,7 +171,7 @@ class Pawns(SimplePieces):
 
 
         #LEFT CAPTURE
-        post_move = self.left_captures(self.bitboard, enemy_pieces)
+        post_move = self.left_captures(self.bitboard, enemy_pieces, info_bitboard)
         while post_move:
 
             #get least-significant bit's bitboard of post-move bitboard
@@ -169,7 +193,7 @@ class Pawns(SimplePieces):
 
 
         #RIGHT CAPTURE
-        post_move = self.right_captures(self.bitboard, enemy_pieces)
+        post_move = self.right_captures(self.bitboard, enemy_pieces, info_bitboard)
         while post_move:
 
             #get least-significant bit's bitboard of post-move bitboard
@@ -187,6 +211,8 @@ class Pawns(SimplePieces):
 
             #remove lsb from post_move bitboard so that we can repeat with next move
             post_move = Bitboard.remove_lsb(post_move, to_square)
+
+        
 
 
 

@@ -26,6 +26,8 @@ class Pieces(Bitboard):
         
         self.type = type
         self.color = color
+        self.symbol = ""
+        self.mark = False
         
 
     def move(self):

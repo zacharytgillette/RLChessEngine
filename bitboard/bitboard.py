@@ -61,6 +61,11 @@ class Bitboard:
 
         return to_ret
     
+    #reverses order of 64 bit binary number
+    def reverse(bitboard):
+
+        return int(Bitboard.to_string(bitboard)[::-1], 2)
+    
     #override python print function for clean printing of bitboards
     def print(bitboard, message=""):
 

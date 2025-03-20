@@ -23,8 +23,10 @@ class Knights(SimplePieces):
         
         if bitboard == None and color == WHITE:
             self.bitboard = 0x0000000000000042
+            self.symbol = '\u265E'
         elif bitboard == None and color == BLACK:
             self.bitboard = 0x4200000000000000
+            self.symbol = '\u2658'
         else:
             self.bitboard = bitboard
 
@@ -76,7 +78,7 @@ class Knights(SimplePieces):
     compute resulting bitboards
     '''
 
-    def all_moves(self, empty_squares, enemy_pieces):
+    def all_moves(self, empty_squares, enemy_pieces, info_bitboard):
 
         #store all the (pre-move, post-move) mappings of individual piece bitmaps
         unique_post_move_bitboards = []
